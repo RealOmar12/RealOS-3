@@ -462,7 +462,7 @@ const Apps = {
                         <button class="calc-btn cb-dk" onclick="Apps.calc.add('2',this)">2</button>
                         <button class="calc-btn cb-dk" onclick="Apps.calc.add('3',this)">3</button>
                         <button class="calc-btn cb-or" onclick="Apps.calc.add('+',this)">+</button>
-                        <button class="calc-btn cb-dk" style="grid-column:span 2; border-radius:24px; aspect-ratio:auto;" onclick="Apps.calc.add('0',this)">0</button>
+                        <button class="calc-btn cb-dk" style="grid-column:span 2; border-radius:100px; aspect-ratio:auto;" onclick="Apps.calc.add('0',this)">0</button>
                         <button class="calc-btn cb-dk" onclick="Apps.calc.add('.',this)">.</button>
                         <button class="calc-btn cb-or" onclick="Apps.calc.solve()">=</button>
                     </div>
@@ -563,9 +563,10 @@ const Apps = {
                 appHeader.style.visibility = 'visible';
                 const isDark = State.darkMode;
                 const bgBlur = isDark ? 'rgba(0,0,0,0.7)' : 'rgba(242,242,247,0.7)';
-                appHeader.style.background = State.liteMode ? '' : bgBlur;
-                appHeader.style.backdropFilter = State.liteMode ? '' : 'blur(20px)';
-                appHeader.style.webkitBackdropFilter = State.liteMode ? '' : 'blur(20px)';
+                const useGlass = !State.liteMode && !State.glassUI;
+                appHeader.style.background = useGlass ? bgBlur : '';
+                appHeader.style.backdropFilter = useGlass ? 'blur(20px)' : '';
+                appHeader.style.webkitBackdropFilter = useGlass ? 'blur(20px)' : '';
                 appHeader.style.position = '';
                 appHeader.style.top = '';
                 appHeader.style.left = '';
@@ -1090,11 +1091,7 @@ const Apps = {
                         </div>
                     </div>
                     <div class="list-group" style="margin-top:10px;">
-                        <div class="list-item anim-config-slider">
-                            <div class="ac-label-row"><span>Scale Duration</span><span class="ac-value" id="ac-scale-time-val">${(ac.openScaleTime || 0.5).toFixed(2)}s</span></div>
-                            <div class="custom-slider" data-min="25" data-max="90" data-step="1" data-value="${((ac.openScaleTime || 0.5) * 100).toFixed(0)}" data-oninput="Apps.settings.setAnimConfig('openScaleTime', value / 100)"><div class="cs-track"><div class="cs-fill"><div class="cs-thumb"></div></div></div></div>
-                            <div class="ac-range-labels"><span>Fast</span><span>Slow</span></div>
-                        </div>
+
                         <div class="list-item anim-config-slider">
                             <div class="ac-label-row"><span>Zoom Out Scale</span><span class="ac-value" id="ac-zoom-out-val">${((ac.openAppZoomOut !== undefined ? ac.openAppZoomOut : 0.98) * 100).toFixed(0)}%</span></div>
                             <div class="custom-slider" data-min="10" data-max="100" data-step="1" data-value="${(ac.openAppZoomOut !== undefined ? ac.openAppZoomOut : 0.98) * 100}" data-oninput="Apps.settings.setAnimConfig('openAppZoomOut', value / 100)"><div class="cs-track"><div class="cs-fill"><div class="cs-thumb"></div></div></div></div>
@@ -1109,12 +1106,6 @@ const Apps = {
                             <div class="ac-range-labels"><span>Normal</span><span>Deep</span></div>
                         </div>
 
-                        <div class="list-item" onclick="Apps.settings.toggleAnimConfigValue('openAppFade')">
-                            <span>App Boxes Fade Out</span>
-                            <div class="toggle ${(ac.openAppFade) ? 'active' : ''}">
-                                <div class="knob"></div>
-                            </div>
-                        </div>
                     </div>
                     <div style="padding:0 20px 5px; font-size:13px; color:var(--text-sec); margin-top:10px;">CLOSING ANIMATION</div>
                     <div class="list-group">
@@ -1217,17 +1208,16 @@ const Apps = {
                                 <div class="cs-track"><div class="cs-fill"><div class="cs-thumb"></div></div></div>
                             </div>
                         </div>
-                        <div class="list-item" style="display:block; cursor:default">
-                            <div style="margin-bottom:10px; font-size:14px; display:flex; justify-content:space-between;">
-                                <span>Phone Height (px)</span>
-                                <span style="color:var(--text-sec)" id="dev-height-val">${State.devHeight || 860}</span>
-                            </div>
-                            <div class="custom-slider" data-min="860" data-max="1200" data-step="10" data-value="${State.devHeight || 860}" data-oninput="Apps.settings.setDevHeight(value)">
-                                <div class="cs-track"><div class="cs-fill"><div class="cs-thumb"></div></div></div>
-                            </div>
+                    </div>
+                    <div style="padding:0 20px 5px; margin-top:15px; font-size:13px; color:var(--text-sec);">PERFORMANCE</div>
+                    <div class="list-group">
+                        <div class="list-item" onclick="Apps.settings.toggleFps()">
+                            <span>Show Real-time FPS</span>
+                            <div class="toggle ${State.showFps ? 'active' : ''}"></div>
                         </div>
                     </div>
                 </div>`;
+
             }
             else if (view === 'navigation') {
                 headerTitle.innerText = 'Navigation';
@@ -1306,7 +1296,7 @@ const Apps = {
                                 <div class="about-hero" style="position:relative;">
                                 <div class="realos-text">RealOS</div>
                             </div>
-                                <div class="about-ver-text" style="text-align:center; color:var(--text-main); margin-top:16px; margin-bottom: 51px;position: relative;font-size: 18px;bottom: 50px;opacity: 0.6;">3.0.5.0</div>
+                                <div class="about-ver-text" style="text-align:center; color:var(--text-main); margin-top:16px; margin-bottom: 51px;position: relative;font-size: 18px;bottom: 50px;opacity: 0.6;">3.0.307.0</div>
                             </div>
                             <div style="padding:0; position:relative; z-index:2;">
                                 
@@ -1317,7 +1307,7 @@ const Apps = {
                                     </div>
                                     <div class="list-item about-list-item" style="cursor:pointer;" onclick="Apps.settings.handleOSClick()">
                                         <span style="font-weight:600; color:var(--text-main); font-size:18px;">OS Version</span>
-                                        <span class="val">OS3.0.5.0WPACNXM</span>
+                                        <span class="val">OS3.0.307.0.WPACNXM</span>
                                     </div>
                                     <div class="list-item about-list-item" style="cursor:default;">
                                         <span style="font-weight:600; color:var(--text-main); font-size:18px;">Browser Storage</span>
@@ -1673,6 +1663,15 @@ const Apps = {
             OS.applySettings();
             const toggle = event.target.closest('.list-item').querySelector('.toggle');
             if (toggle) toggle.classList.toggle('active', State.tapIndicators);
+        },
+        toggleFps: () => {
+            if (window.event) {
+                const toggle = window.event.target.closest('.list-item').querySelector('.toggle');
+                OS.toggleFps(!State.showFps);
+                if (toggle) toggle.classList.toggle('active', State.showFps);
+            } else {
+                OS.toggleFps(!State.showFps);
+            }
         },
         toggleGlass: () => {
             State.glassUI = !State.glassUI;
@@ -2675,18 +2674,12 @@ const Apps = {
         },
         resetDevDimensions: () => {
             Apps.settings.setDevWidth(400);
-            Apps.settings.setDevHeight(860);
             const wSlider = document.querySelector('[data-oninput="Apps.settings.setDevWidth(value)"]');
-            const hSlider = document.querySelector('[data-oninput="Apps.settings.setDevHeight(value)"]');
             if (wSlider) {
                 wSlider.dataset.value = '400';
                 wSlider.style.setProperty('--slider-pct', 0);
             }
-            if (hSlider) {
-                hSlider.dataset.value = '860';
-                hSlider.style.setProperty('--slider-pct', 0);
-            }
-            Toast.show('Dimensions reset to default');
+            Toast.show('Width reset to default');
         },
         setAnimSpeed: (speed) => {
             State.animationSpeed = speed;

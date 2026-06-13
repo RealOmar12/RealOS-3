@@ -173,6 +173,12 @@ const Storage = {
             }
 
             Object.assign(State, parsed);
+            if (!localStorage.getItem('realos_v3_migrated_4apps')) {
+                if (State.emptyApps && State.emptyApps.length >= 4) {
+                    State.emptyApps.length = State.emptyApps.length - 4;
+                }
+                localStorage.setItem('realos_v3_migrated_4apps', 'true');
+            }
             if (State.ccToggles) {
                 setTimeout(() => {
                     if (State.ccToggles.circles) {

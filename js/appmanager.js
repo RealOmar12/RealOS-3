@@ -24,10 +24,9 @@ const AppManager = {
                         });
                     }
 
-                    const blurAmt = getComputedStyle(document.body).getPropertyValue('--wall-blur-amt').trim() || '50px';
                     clone.animate([
                         { filter: startFilter },
-                        { filter: `blur(${blurAmt}) brightness(0.5)` }
+                        { filter: `blur(25px) brightness(0.5)` }
                     ], {
                         duration: 250 * State.animationSpeed,
                         easing: 'ease-out',
@@ -114,6 +113,18 @@ const AppManager = {
                     header.style.color = isDarkApp ? '#fff' : '#000';
                     document.getElementById('app-title').innerText = id === 'settings' ? '' : (appInfo.name || id);
                     header.classList.remove('calc-header');
+                    header.style.background = '';
+                    header.style.backdropFilter = '';
+                    header.style.webkitBackdropFilter = '';
+                    header.style.position = '';
+                    header.style.top = '';
+                    header.style.left = '';
+                    header.style.right = '';
+                    header.style.width = '';
+                    header.style.zIndex = '';
+                    header.style.pointerEvents = '';
+                    header.style.display = 'flex';
+                    header.style.visibility = 'visible';
                 }
                 win.classList.remove('calc-app-bg');
                 const appBack = document.getElementById('app-back');
@@ -124,13 +135,8 @@ const AppManager = {
                 if (typeof Apps !== 'undefined' && Apps[id] && Apps[id].render) {
                     Apps[id].render();
                 } else if (appBody) {
-                    appBody.innerHTML = `
-                        <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; color:${isDarkApp ? '#fff' : '#000'}">
-                            <i class="fas fa-tools" style="font-size:50px; margin-bottom:20px; opacity:0.3"></i>
-                            <div style="font-size:22px; font-weight:600; margin-bottom:8px">Work in Progress</div>
-                            <div style="font-size:15px; opacity:0.6; max-width:80%">This application is currently under development.</div>
-                        </div>
-                    `;
+                    appBody.innerHTML = '';
+                    if (header) header.style.display = 'none';
                 }
 
                 if (State.glassUI && appBody) {
@@ -201,9 +207,12 @@ const AppManager = {
                     { top: '0px', left: '0px', opacity: '1' }
                 ], { duration: totalDur * 1000, easing: openEase, fill: 'forwards' });
 
+                const reScreenW = document.getElementById('screen').offsetWidth;
+                const reScreenH = document.getElementById('screen').offsetHeight;
                 const scaleAnim = win.animate([
-                    { width: `${curW}px`, height: `${curH}px`, borderRadius: curRadius },
-                    { width: document.getElementById('screen').offsetWidth + 'px', height: document.getElementById('screen').offsetHeight + 'px', borderRadius: '60px' }
+                    { width: `${curW}px`, height: `${curH}px`, borderRadius: curRadius, offset: 0 },
+                    { width: `${curW + (reScreenW - curW) * 0.3}px`, height: `${curH + (reScreenH - curH) * 0.3}px`, borderRadius: curRadius, offset: 0.3 },
+                    { width: reScreenW + 'px', height: reScreenH + 'px', borderRadius: '60px', offset: 1 }
                 ], { duration: scaleDur * 1000, easing: openScaleEase, fill: 'forwards' });
 
                 win._syncZoomState = { active: true };
@@ -458,7 +467,12 @@ const AppManager = {
         const packIconNorm = State.iconPack === 'hyperos' ? appInfo.hyperIcon : (State.iconPack === 'coloros' ? appInfo.colorIcon : null);
         const isImagePackNorm = (State.iconPack === 'hyperos' || State.iconPack === 'coloros') && packIconNorm;
         if (isImagePackNorm) {
-            iconOverlay.innerHTML = `<img src="${packIconNorm}" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit; transform: scale(1.0);">`;
+            let packColor = State.iconPack === 'hyperos' ? appInfo.hyperColor : appInfo.colorColor;
+            iconOverlay.style.background = packColor;
+            iconOverlay.style.flexDirection = 'column';
+            iconOverlay.style.alignItems = 'center';
+            iconOverlay.style.justifyContent = 'flex-start';
+            iconOverlay.innerHTML = `<img src="${packIconNorm}" style="width: 100%; height: auto; border-top-left-radius: inherit; border-top-right-radius: inherit; transform: scale(1.0); flex-shrink: 0; outline: none; border: none;">`;
         } else if (appInfo.id === 'photos') {
             iconOverlay.innerHTML = `<div style="width:100%; height:100%; border-radius:inherit; display:flex; justify-content:center; align-items:center; background:${overlayBg}; position:relative; overflow:hidden;"><div class="photos-icon-flower" style="transform: scale(1.0); scale: var(--icon-scale-factor); transition: transform ${0.5 * State.animationSpeed}s cubic-bezier(0.2, 0.85, 0.1, 1);"><div class="petal-wrap p1"><div class="petal"></div></div><div class="petal-wrap p2"><div class="petal"></div></div><div class="petal-wrap p3"><div class="petal"></div></div><div class="petal-wrap p4"><div class="petal"></div></div><div class="petal-wrap p5"><div class="petal"></div></div><div class="petal-wrap p6"><div class="petal"></div></div><div class="petal-wrap p7"><div class="petal"></div></div><div class="petal-wrap p8"><div class="petal"></div></div></div></div>`;
         } else if (appInfo.id === 'settings') {
@@ -537,13 +551,8 @@ const AppManager = {
             Apps[id].render();
         } else {
             if (appBody) {
-                appBody.innerHTML = `
-                            <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; color:${isDarkApp ? '#fff' : '#000'}">
-                                <i class="fas fa-tools" style="font-size:50px; margin-bottom:20px; opacity:0.3"></i>
-                                <div style="font-size:22px; font-weight:600; margin-bottom:8px">Work in Progress</div>
-                                <div style="font-size:15px; opacity:0.6; max-width:80%">This application is currently under development.</div>
-                            </div>
-                        `;
+                appBody.innerHTML = '';
+                if (header) header.style.display = 'none';
             }
         }
         OS.updateStatusBarColors(true, isDarkApp);
@@ -602,8 +611,9 @@ const AppManager = {
                 }
                 const totalDur = 0.5 * State.animationSpeed;
                 const startBg = win.style.background;
-                let endBg = isDarkApp ? '#000' : '#f2f2f7';
+                let endBg = appInfo.color || (isDarkApp ? '#000' : '#f2f2f7');
                 if (State.glassUI) endBg = State.darkMode ? 'rgba(30,30,30,0.65)' : 'rgba(243,243,243,0.65)';
+                if (appInfo.id === 'clock') endBg = State.darkMode ? '#000' : '#fff';
 
                 OS.updateStatusBarColors(true, isDarkApp);
 
@@ -636,7 +646,7 @@ const AppManager = {
                     if (State.animConfig.openWallBlur === false && !State.homescreenBlur) {
                         document.body.style.setProperty('--wall-blur-amt', '0px');
                     } else {
-                        document.body.style.setProperty('--wall-blur-amt', '50px');
+                        document.body.style.setProperty('--wall-blur-amt', '25px');
                     }
 
                     if (AppManager._currentOpenAnim) { try { AppManager._currentOpenAnim.cancel(); } catch (e) { } }
@@ -658,6 +668,7 @@ const AppManager = {
                     const screenHNum = document.getElementById('screen').offsetHeight;
                     const scaleAnim = win.animate([
                         { width: startWidth + 'px', height: startHeight + 'px', borderRadius: startRadius, offset: 0 },
+                        { width: (startWidth + (screenWNum - startWidth) * 0.3) + 'px', height: (startHeight + (screenHNum - startHeight) * 0.3) + 'px', borderRadius: startRadius, offset: 0.3 },
                         { width: screenWNum + 'px', height: screenHNum + 'px', borderRadius: '60px', offset: 1 }
                     ], {
                         duration: scaleDur * 1000,
@@ -751,14 +762,13 @@ const AppManager = {
         });
     },
     close: () => {
-        const totalDurCalc = document.getElementById('app-window').classList.contains('app-animating') ? 0.60 * State.animationSpeed : 0.45 * State.animationSpeed;
+        const totalDurCalc = document.getElementById('app-window').classList.contains('app-animating') ? 0.70 * State.animationSpeed : 0.60 * State.animationSpeed;
         const morphDurCalc = totalDurCalc * (State.animConfig.closeShapeMorph || 0.34);
 
         document.querySelectorAll('.app-window-closing-clone').forEach(clone => {
             if (clone.getAnimations && clone.getAnimations().some(a => a.effect && a.effect.getKeyframes && a.effect.getKeyframes().some(k => k.filter))) {
                 const currentFilter = window.getComputedStyle(clone).filter;
-                const blurAmt = getComputedStyle(document.body).getPropertyValue('--wall-blur-amt').trim() || '50px';
-                const startFilter = (currentFilter && currentFilter !== 'none') ? currentFilter : `blur(${blurAmt}) brightness(0.5)`;
+                const startFilter = (currentFilter && currentFilter !== 'none') ? currentFilter : `blur(25px) brightness(0.5)`;
 
                 clone.getAnimations().forEach(a => {
                     if (a.effect && a.effect.getKeyframes && a.effect.getKeyframes().some(k => k.filter)) {
@@ -1012,16 +1022,21 @@ const AppManager = {
         const isImagePackClose = (State.iconPack === 'hyperos' || State.iconPack === 'coloros') && packIconClose;
         let iconInner;
         if (isImagePackClose) {
+            let packColorClose = State.iconPack === 'hyperos' ? appInfo.hyperColor : appInfo.colorColor;
+            iconLayer.style.background = packColorClose;
+            iconLayer.style.flexDirection = 'column';
+            iconLayer.style.alignItems = 'center';
+            iconLayer.style.justifyContent = 'flex-start';
             iconInner = document.createElement('img');
             iconInner.src = packIconClose;
-            iconInner.style.cssText = `width: 100%; height: 100%; object-fit: cover; border-radius: inherit; transform: scale(1.0); transition: transform ${0.45 * State.animationSpeed}s cubic-bezier(0.32, 0.72, 0, 1); outline:none; border:none; box-shadow:none;`;
+            iconInner.style.cssText = `width: 100%; height: auto; border-top-left-radius: inherit; border-top-right-radius: inherit; transform: scale(1.0); flex-shrink: 0; transition: transform ${0.50 * State.animationSpeed}s cubic-bezier(0.32, 0.72, 0, 1); outline:none; border:none; box-shadow:none;`;
             iconLayer.style.outline = 'none';
             iconLayer.style.border = 'none';
             iconLayer.appendChild(iconInner);
         } else if (appInfo.id === 'photos') {
             const bg = appInfo.color || comp.backgroundColor;
             iconLayer.style.background = bg || '#fff';
-            iconLayer.innerHTML = `<div class="photos-icon-flower" style="transform: scale(1.8); scale: var(--icon-scale-factor); transition: transform ${0.45 * State.animationSpeed}s cubic-bezier(0.34, 1.15, 0.64, 1);"><div class="petal-wrap p1"><div class="petal"></div></div><div class="petal-wrap p2"><div class="petal"></div></div><div class="petal-wrap p3"><div class="petal"></div></div><div class="petal-wrap p4"><div class="petal"></div></div><div class="petal-wrap p5"><div class="petal"></div></div><div class="petal-wrap p6"><div class="petal"></div></div><div class="petal-wrap p7"><div class="petal"></div></div><div class="petal-wrap p8"><div class="petal"></div></div></div>`;
+            iconLayer.innerHTML = `<div class="photos-icon-flower" style="transform: scale(1.8); scale: var(--icon-scale-factor); transition: transform ${0.50 * State.animationSpeed}s cubic-bezier(0.34, 1.15, 0.64, 1);"><div class="petal-wrap p1"><div class="petal"></div></div><div class="petal-wrap p2"><div class="petal"></div></div><div class="petal-wrap p3"><div class="petal"></div></div><div class="petal-wrap p4"><div class="petal"></div></div><div class="petal-wrap p5"><div class="petal"></div></div><div class="petal-wrap p6"><div class="petal"></div></div><div class="petal-wrap p7"><div class="petal"></div></div><div class="petal-wrap p8"><div class="petal"></div></div></div>`;
             iconLayer.style.outline = 'none';
             iconLayer.style.border = 'none';
         } else if (id.startsWith('empty_')) {
@@ -1031,7 +1046,7 @@ const AppManager = {
         } else if (appInfo.id === 'settings') {
             const bg = appInfo.color || comp.backgroundColor;
             iconLayer.style.background = bg || '#8e8e93';
-            iconLayer.innerHTML = `<div class="settings-icon-gear" style="transform: scale(2.05); scale: var(--icon-scale-factor); transition: transform ${0.45 * State.animationSpeed}s cubic-bezier(0.34, 1.15, 0.64, 1);">
+            iconLayer.innerHTML = `<div class="settings-icon-gear" style="transform: scale(2.05); scale: var(--icon-scale-factor); transition: transform ${0.50 * State.animationSpeed}s cubic-bezier(0.34, 1.15, 0.64, 1);">
                 <div class="gear-base"></div>
                 <div class="gear-teeth">
                     <div class="tooth"></div><div class="tooth"></div><div class="tooth"></div>
@@ -1045,7 +1060,7 @@ const AppManager = {
             iconLayer.style.border = 'none';
         } else if (appInfo.id === 'camera') {
             iconLayer.style.background = 'linear-gradient(135deg, #fbfbfb 0%, #e8e8e8 50%, #d1d1d1 100%)';
-            iconLayer.innerHTML = `<div class="camera-icon-lens" style="transform: scale(2.5); scale: var(--icon-scale-factor); transition: transform ${0.45 * State.animationSpeed}s cubic-bezier(0.34, 1.15, 0.64, 1);">
+            iconLayer.innerHTML = `<div class="camera-icon-lens" style="transform: scale(2.5); scale: var(--icon-scale-factor); transition: transform ${0.50 * State.animationSpeed}s cubic-bezier(0.34, 1.15, 0.64, 1);">
                 <div class="camera-base"></div>
                 <div class="lens-outer-ring"></div>
                 <div class="lens-inner-black"></div>
@@ -1058,7 +1073,7 @@ const AppManager = {
             iconLayer.style.border = 'none';
         } else if (appInfo.id === 'music') {
             iconLayer.style.background = '#fa2d48';
-            iconLayer.innerHTML = `<div class="music-icon-note" style="transform: scale(2.0); scale: var(--icon-scale-factor); transition: transform ${0.45 * State.animationSpeed}s cubic-bezier(0.34, 1.15, 0.64, 1);">
+            iconLayer.innerHTML = `<div class="music-icon-note" style="transform: scale(2.0); scale: var(--icon-scale-factor); transition: transform ${0.50 * State.animationSpeed}s cubic-bezier(0.34, 1.15, 0.64, 1);">
                 <div class="music-note">&#9834;</div>
                 <div class="music-sparkles">
                     <div class="sparkle sparkle-lg" style="top:22%; right:2%;"></div>
@@ -1074,7 +1089,7 @@ const AppManager = {
             const now = new Date();
             const hDeg = (now.getHours() % 12) * 30 + now.getMinutes() * 0.5 + now.getSeconds() * (0.5 / 60);
             const mDeg = now.getMinutes() * 6 + now.getSeconds() * 0.1;
-            iconLayer.innerHTML = `<div class="clock-icon-face" style="transform: scale(2.0); scale: var(--icon-scale-factor); transition: transform ${0.45 * State.animationSpeed}s cubic-bezier(0.34, 1.15, 0.64, 1);">
+            iconLayer.innerHTML = `<div class="clock-icon-face" style="transform: scale(2.0); scale: var(--icon-scale-factor); transition: transform ${0.50 * State.animationSpeed}s cubic-bezier(0.34, 1.15, 0.64, 1);">
                 <div class="clock-dial"></div>
                 <div class="clock-hand clock-hour" style="transform: rotate(${hDeg}deg);"></div>
                 <div class="clock-hand clock-minute" style="transform: rotate(${mDeg}deg);"></div>
@@ -1087,7 +1102,7 @@ const AppManager = {
             iconLayer.style.background = bg || '#000';
             iconInner = document.createElement('i');
             iconInner.className = `fas ${appInfo.icon}`;
-            iconInner.style.cssText = `font-size: 28px; scale: var(--icon-scale-factor); color: ${appInfo.text || 'white'}; display: flex; align-items: center; justify-content: center; line-height: 1; width: 100%; height: 100%; transition: font-size ${0.45 * State.animationSpeed}s cubic-bezier(0.32, 0.72, 0, 1);`;
+            iconInner.style.cssText = `font-size: 28px; scale: var(--icon-scale-factor); color: ${appInfo.text || 'white'}; display: flex; align-items: center; justify-content: center; line-height: 1; width: 100%; height: 100%; transition: font-size ${0.50 * State.animationSpeed}s cubic-bezier(0.32, 0.72, 0, 1);`;
 
             const lowBg = (bg || "").toString().toLowerCase().trim();
             const isWhiteBg = lowBg === '#fff' || lowBg.startsWith('#ffffff') || lowBg === 'white' || lowBg.replace(/\s/g, '') === 'rgb(255,255,255)';
@@ -1168,7 +1183,7 @@ const AppManager = {
             };
         }
         void closeClone.offsetWidth;
-        const totalDur = win.classList.contains('app-animating') ? 0.60 * State.animationSpeed : 0.45 * State.animationSpeed;
+        const totalDur = win.classList.contains('app-animating') ? 0.70 * State.animationSpeed : 0.60 * State.animationSpeed;
         const morphDur = totalDur * State.animConfig.closeShapeMorph;
         const iconFadeDur = morphDur * State.animConfig.closeIconFade;
         if (morphToIsland && islandMorphTarget) {
@@ -1341,7 +1356,7 @@ const AppManager = {
                 { transform: `translate(${startLeftHome}px, ${startTopHome}px)`, opacity: currentOp },
                 { transform: `translate(${endLeft}px, ${endTop}px)`, opacity: currentOp }
             ], {
-                duration: totalDur * 0.55 * 1000,
+                duration: totalDur * 0.70 * 1000,
                 easing: closeAnimEase,
                 fill: 'forwards'
             });
@@ -1461,7 +1476,7 @@ const AppManager = {
             });
         }
         if (iconEl && !morphToIsland) {
-            const timeoutDur = Math.max(0, totalDur * 900 * 0.75);
+            const timeoutDur = Math.max(0, totalDur * 900 * 0.70);
             if (AppManager.closingApps[id]) {
                 AppManager.closingApps[id].iconFadeTimeout = setTimeout(() => {
                     iconEl.classList.remove('app-current');

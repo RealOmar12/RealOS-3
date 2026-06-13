@@ -1,4 +1,37 @@
 const OS = {
+    _fpsFrames: 0,
+    _fpsLastTime: 0,
+    _fpsRafId: null,
+    _fpsLoop: (now) => {
+        OS._fpsFrames++;
+        const delta = now - OS._fpsLastTime;
+        if (delta >= 100) {
+            const fps = Math.round((OS._fpsFrames * 1000) / delta);
+            const el = document.getElementById('fps-counter');
+            if (el) el.textContent = fps + ' FPS';
+            OS._fpsLastTime = now;
+            OS._fpsFrames = 0;
+        }
+        OS._fpsRafId = requestAnimationFrame(OS._fpsLoop);
+    },
+    startFps: () => {
+        const el = document.getElementById('fps-counter');
+        if (el) el.style.display = '';
+        if (OS._fpsRafId) cancelAnimationFrame(OS._fpsRafId);
+        OS._fpsFrames = 0;
+        OS._fpsLastTime = performance.now();
+        OS._fpsRafId = requestAnimationFrame(OS._fpsLoop);
+    },
+    stopFps: () => {
+        if (OS._fpsRafId) { cancelAnimationFrame(OS._fpsRafId); OS._fpsRafId = null; }
+        const el = document.getElementById('fps-counter');
+        if (el) el.style.display = 'none';
+    },
+    toggleFps: (on) => {
+        State.showFps = on;
+        localStorage.setItem('realos_v3_showfps', on ? 'true' : 'false');
+        if (on) OS.startFps(); else OS.stopFps();
+    },
     getShapeRadius: () => {
         let v = parseInt(State.appShape);
         if (isNaN(v)) v = 50;
@@ -252,6 +285,7 @@ const OS = {
         OS.updateTime();
         OS.applySettings();
         if (State.liteMode) document.body.classList.add('lite-mode');
+        if (State.showFps) OS.startFps();
         setInterval(OS.updateTime, 1000);
         const updateBattery = (level) => {
             const pct = Math.round(level * 100);
@@ -779,7 +813,7 @@ const OS = {
         const maxIcons = 6 * 4;
         const gridEls = Array.from(document.getElementById('app-grid').children)
             .filter(el => el.classList.contains('app-icon') && el.id !== 'home-add-btn');
-        if (State.emptyApps.length >= 16 || gridEls.length >= maxIcons) {
+        if (State.emptyApps.length >= 12 || gridEls.length >= maxIcons) {
             return;
         }
         const id = 'empty_' + Date.now();
@@ -975,7 +1009,7 @@ const OS = {
                 if (State.swipeToClose && State.activeApp && State.activeApp !== 'home') {
                     const win = document.getElementById('app-window');
                     if (win) {
-                        const scale = Math.max(0.96, 1 + (diff / 2000));
+                        const scale = Math.max(0.85, 1 + (diff / 500));
                         const winDiff = atMax ? visualDiff - 2 : visualDiff;
                         let hDiff = 0;
                         if (atMax) {
@@ -993,7 +1027,7 @@ const OS = {
             newBar.style.setProperty('cursor', 'grab', 'important');
             document.body.style.cursor = '';
             if (State.swipeToClose) {
-                if (startY && (y - startY < -5)) {
+                if (startY && (y - startY < -20)) {
                     requestAnimationFrame(() => AppManager.close());
                 } else {
                     if (State.activeApp && State.activeApp !== 'home') {
@@ -1072,7 +1106,7 @@ const OS = {
         const animDur = 0.5 * State.animationSpeed;
         document.documentElement.style.setProperty('--home-anim-dur', `${animDur}s`);
 
-        const closeMorphDur = (0.45 * State.animationSpeed) * (State.animConfig.closeShapeMorph || 0.34);
+        const closeMorphDur = (0.55 * State.animationSpeed) * (State.animConfig.closeShapeMorph || 0.34);
         document.documentElement.style.setProperty('--blur-behind-open-dur', `${0.25 * State.animationSpeed}s`);
         document.documentElement.style.setProperty('--blur-behind-close-dur', `${closeMorphDur}s`);
 

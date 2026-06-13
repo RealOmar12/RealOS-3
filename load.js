@@ -39,8 +39,8 @@ document.addEventListener('DOMContentLoaded', () => {
     Promise.all([fontsReady, windowLoaded, minTime]).then(() => {
         if (gls) gls.style.opacity = '0';
         if (scaleWrapper) scaleWrapper.style.opacity = '1';
-        
-        setTimeout(() => {
+
+                setTimeout(() => {
             window.dispatchEvent(new Event('realos_loaded'));
             if (gls) gls.remove();
         }, 1500);

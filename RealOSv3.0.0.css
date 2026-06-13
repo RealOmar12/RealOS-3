@@ -1109,8 +1109,8 @@ body.ls-active.vid-special-effects #wallpaper-layer {
 }
 
 body.app-open #wallpaper-layer {
-    -webkit-filter: blur(var(--wall-blur-amt, 50px)) brightness(0.8);
-    filter: blur(var(--wall-blur-amt, 50px)) brightness(0.8);
+    -webkit-filter: blur(var(--wall-blur-amt, 25px)) brightness(0.8);
+    filter: blur(var(--wall-blur-amt, 25px)) brightness(0.8);
     transition: -webkit-filter var(--wall-blur-dur, 0.10s) ease-out, filter var(--wall-blur-dur, 0.10s) ease-out, transform 0.5s var(--ease-ios);
     transform: scale(var(--app-open-wall-scale, 1.05)) translate3d(0, 0, 0);
     will-change: filter, -webkit-filter, transform;
@@ -1118,8 +1118,8 @@ body.app-open #wallpaper-layer {
 }
 
 body.app-open.blur-behind #wallpaper-layer {
-    -webkit-filter: blur(var(--wall-blur-amt, 50px)) brightness(0.5);
-    filter: blur(var(--wall-blur-amt, 50px)) brightness(0.5);
+    -webkit-filter: blur(var(--wall-blur-amt, 25px)) brightness(0.5);
+    filter: blur(var(--wall-blur-amt, 25px)) brightness(0.5);
     transition: -webkit-filter var(--blur-behind-open-dur, 0.25s) ease-out, filter var(--blur-behind-open-dur, 0.25s) ease-out, transform 0.5s var(--ease-ios);
     transform: scale(var(--app-open-wall-scale, 1.05)) translate3d(0, 0, 0);
     will-change: filter, -webkit-filter, transform;
@@ -1142,7 +1142,7 @@ body.hs-blur:not(.ls-active) #wallpaper-layer {
 }
 
 body.app-open.hs-blur #wallpaper-layer {
-    filter: blur(var(--wall-blur-amt, 50px)) brightness(0.8);
+    filter: blur(var(--wall-blur-amt, 25px)) brightness(0.8);
     transition: filter var(--wall-blur-dur, 0.01s) ease-out, transform 0.5s var(--ease-ios);
     transform: scale(var(--app-open-wall-scale, 1.05));
 }
@@ -1891,8 +1891,8 @@ body.app-open.fade-app-boxes:not(.blur-behind) .dock {
 
 body.app-open.blur-behind #app-grid,
 body.app-open.blur-behind .dock {
-    -webkit-filter: blur(var(--wall-blur-amt, 50px)) brightness(0.5);
-    filter: blur(var(--wall-blur-amt, 50px)) brightness(0.5);
+    -webkit-filter: blur(var(--wall-blur-amt, 25px)) brightness(0.5);
+    filter: blur(var(--wall-blur-amt, 25px)) brightness(0.5);
     transition: -webkit-filter var(--blur-behind-open-dur, 0.25s) ease-out, filter var(--blur-behind-open-dur, 0.25s) ease-out, opacity 0.5s ease;
     transform: translate3d(0, 0, 0);
     will-change: filter, -webkit-filter, transform;
@@ -1982,6 +1982,7 @@ body.dark-mode.lite-mode .dock {
     justify-content: center;
     align-items: center;
     position: relative;
+    overflow: hidden;
     transition: opacity 0.15s ease, filter 0.1s;
 }
 
@@ -2292,8 +2293,6 @@ body.drag-mode #home-contents {
     overflow: hidden;
     contain: paint;
     transform-origin: top left;
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
     outline: 1px solid transparent;
@@ -2972,19 +2971,20 @@ input[type=range] {
 .calc-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    padding: 15px;
+    gap: 16px;
+    padding: 20px;
+    width: 100%;
     max-width: 450px;
-    margin: 0 auto;
+    margin: 0 auto 20px auto;
     align-content: end;
 }
 
 .calc-btn {
     width: 100%;
     aspect-ratio: 1;
-    border-radius: 24px;
+    border-radius: 50%;
     border: none;
-    font-size: 28px;
+    font-size: 32px;
     color: white;
     cursor: pointer;
     backdrop-filter: blur(10px);
@@ -3005,14 +3005,19 @@ input[type=range] {
 }
 
 .calc-display {
-    text-align: right;
     color: var(--text-main);
-    font-size: 70px;
-    padding: 40px 20px 20px;
-    font-weight: 200;
-    margin: 60px auto 0 auto;
+    font-size: 80px;
+    padding: 20px 30px 10px 30px;
+    font-weight: 300;
+    margin: 0 auto;
     max-width: 450px;
     width: 100%;
+    flex: 1;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    word-break: break-all;
 }
 
 #app-window.calc-app-bg {
@@ -4853,8 +4858,8 @@ body[data-app-shape="rounded"] .icon-box {
 
 body.glass-ui #app-window {
     background: rgba(243, 243, 243, 0.65);
-    backdrop-filter: blur(30px) !important;
-    -webkit-backdrop-filter: blur(30px) !important;
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px) !important;
 }
 
 body.glass-ui.dark-mode #app-window {
@@ -4905,8 +4910,6 @@ body.glass-ui.dark-mode .os-modal {
 
 body.glass-ui .timer-scroll-digit {
     background: rgba(243, 243, 243, 0.2) !important;
-    backdrop-filter: blur(30px) saturate(180%) !important;
-    -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
@@ -4937,8 +4940,6 @@ body.glass-ui .toggle.active {
 
 
 body.glass-ui .calc-btn {
-    backdrop-filter: blur(20px) saturate(180%) !important;
-    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
     border: 1px solid rgba(255, 255, 255, 0.15);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
@@ -4956,8 +4957,6 @@ body.glass-ui .cb-or {
 }
 
 body.glass-ui .num-btn {
-    backdrop-filter: blur(15px) saturate(180%);
-    -webkit-backdrop-filter: blur(15px) saturate(180%);
     background: rgba(200, 200, 200, 0.15);
     border: 1px solid rgba(255, 255, 255, 0.2);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
@@ -4969,14 +4968,10 @@ body.glass-ui.dark-mode .num-btn {
 }
 
 body.glass-ui .call-btn {
-    backdrop-filter: blur(15px) saturate(180%);
-    -webkit-backdrop-filter: blur(15px) saturate(180%);
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 body.glass-ui .btn-pill {
-    backdrop-filter: blur(15px) saturate(180%);
-    -webkit-backdrop-filter: blur(15px) saturate(180%);
     border: 1px solid rgba(255, 255, 255, 0.2);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
@@ -5791,7 +5786,7 @@ body.drag-mode #home-contents {
     opacity: 1;
     pointer-events: none;
     transition: backdrop-filter 0.35s ease, background-color 0.35s ease, -webkit-backdrop-filter 0.35s ease;
-    background: rgba(0, 0, 0, 0);
+    background: rgba(128, 128, 128, 0);
     backdrop-filter: blur(0px);
     -webkit-backdrop-filter: blur(0px);
     contain: strict;
@@ -5806,13 +5801,118 @@ body.lite-mode #cc-overlay {
 
 #cc-overlay.cc-visible {
     pointer-events: auto;
-    background: rgba(0, 0, 0, 0.55);
+    background: rgba(128, 128, 128, 0.25);
     backdrop-filter: blur(45px);
     -webkit-backdrop-filter: blur(45px);
 }
 
 body.lite-mode #cc-overlay.cc-visible {
     background: rgba(111, 111, 111, 1);
+}
+
+#cc-date {
+    position: absolute;
+    left: 25px;
+    font-size: 15px;
+    font-weight: 600;
+    color: white;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    z-index: 2500;
+    pointer-events: none;
+}
+
+#cc-panel.cc-visible #cc-date {
+    opacity: 1;
+}
+
+#cc-panel.cc-closing #cc-date {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+body.cc-open .status-bar {
+    z-index: auto !important;
+    transition: none !important;
+}
+
+body.cc-open #clock {
+    position: relative;
+    z-index: 2300 !important;
+}
+
+body.cc-open #sb-right {
+    position: relative;
+    z-index: 2500 !important;
+}
+
+body.cc-brightness-preview #cc-overlay.cc-visible {
+    backdrop-filter: blur(0px) !important;
+    -webkit-backdrop-filter: blur(0px) !important;
+    background: rgba(128, 128, 128, 0) !important;
+    transition: backdrop-filter 0.35s ease, -webkit-backdrop-filter 0.35s ease, background-color 0.35s ease !important;
+}
+
+body.cc-brightness-preview .cc-content > * {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: opacity 0.2s ease !important;
+}
+
+body.cc-brightness-preview .cc-content > .cc-row-2 {
+    opacity: 1 !important;
+    pointer-events: none !important;
+    transition: none !important;
+}
+
+body.cc-brightness-preview .cc-row-2 > * {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: opacity 0.2s ease !important;
+}
+
+body.cc-brightness-preview .cc-row-2 > .cc-slider-group {
+    opacity: 1 !important;
+    pointer-events: none !important;
+    transition: none !important;
+}
+
+body.cc-brightness-preview .cc-slider-group > * {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: opacity 0.2s ease !important;
+}
+
+body.cc-brightness-preview .cc-slider-group > .cc-brightness-tile {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    transition: none !important;
+}
+
+body.cc-brightness-preview #cc-date {
+    opacity: 0 !important;
+    transition: opacity 0.2s ease !important;
+}
+
+body.cc-brightness-preview .status-bar {
+    opacity: 0 !important;
+    transition: opacity 0.2s ease !important;
+}
+
+body.cc-open:not(.cc-brightness-preview) #cc-overlay.cc-visible {
+    transition: backdrop-filter 0.5s ease, -webkit-backdrop-filter 0.5s ease, background-color 0.5s ease !important;
+}
+
+body.cc-open:not(.cc-brightness-preview) .cc-content {
+    transition: opacity 0.35s ease !important;
+}
+
+body.cc-open:not(.cc-brightness-preview) #cc-date {
+    transition: opacity 0.35s ease !important;
+}
+
+body.cc-open:not(.cc-brightness-preview) .status-bar {
+    transition: opacity 0.35s ease !important;
 }
 
 #cc-panel {

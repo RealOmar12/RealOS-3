@@ -29,9 +29,6 @@ const ControlCenter = {
 
             const overlay = document.getElementById('cc-overlay');
             const panel = document.getElementById('cc-panel');
-            const statusBar = document.querySelector('.status-bar');
-            const clock = statusBar ? statusBar.querySelector('#clock') : null;
-            const globalClock = document.getElementById('global-clock');
 
             if (!isRelease) {
                 if (!document.body.classList.contains('cc-open')) {
@@ -40,9 +37,6 @@ const ControlCenter = {
                 }
 
                 overlay.style.transition = 'none';
-                if (statusBar) statusBar.style.transition = 'none';
-                if (globalClock) globalClock.style.transition = 'none';
-                if (clock) clock.style.transition = 'none';
 
                 if (progress > 0.96 && !ControlCenter.isOpen) {
                     ControlCenter.isOpen = true;
@@ -66,67 +60,49 @@ const ControlCenter = {
                 } else {
                     overlay.style.backdropFilter = `blur(${progress * 45}px)`;
                     overlay.style.webkitBackdropFilter = `blur(${progress * 45}px)`;
-                    overlay.style.backgroundColor = `rgba(0, 0, 0, ${progress * 0.55})`;
+                    overlay.style.backgroundColor = `rgba(128, 128, 128, ${progress * 0.25})`;
                 }
-                if (globalClock) globalClock.style.opacity = '0';
-                if (statusBar) {
-                    statusBar.style.transform = `translateY(${progress * 40}px)`;
-                    statusBar.style.zIndex = '2500';
+                ControlCenter._updateCCDate();
+                const sbRight = document.getElementById('sb-right');
+                const ccDate = document.getElementById('cc-date');
+                if (sbRight) {
+                    sbRight.style.transition = 'none';
+                    sbRight.style.transform = `translateY(${progress * 40}px)`;
                 }
-                if (clock) clock.style.opacity = '1';
+                if (ccDate) {
+                    ccDate.style.transition = 'none';
+                    ccDate.style.transform = `translateY(${progress * 40}px)`;
+                }
             } else {
-                const ease = '0.45s cubic-bezier(0.2, 0.85, 0.1, 1)';
                 overlay.style.transition = '';
-                if (statusBar) {
-                    statusBar.style.transition = `transform ${ease}`;
-                    void statusBar.offsetHeight;
-                }
-                if (globalClock) globalClock.style.transition = 'opacity 0.2s ease';
-                if (clock) clock.style.transition = 'opacity 0.2s ease';
 
                 if (ControlCenter.isOpen) {
                     overlay.style.backdropFilter = '';
                     overlay.style.webkitBackdropFilter = '';
                     overlay.style.backgroundColor = '';
-                    if (globalClock) globalClock.style.opacity = '0';
-                    if (statusBar) {
-                        statusBar.style.transform = 'translateY(40px)';
-                        statusBar.style.pointerEvents = 'none';
-                    }
-                    if (clock) clock.style.opacity = '1';
                     ControlCenter.syncState();
+                    const sbRight = document.getElementById('sb-right');
+                    const ccDate = document.getElementById('cc-date');
+                    if (sbRight) sbRight.style.transform = `translateY(40px)`;
+                    if (ccDate) ccDate.style.transform = `translateY(40px)`;
                 } else {
+                    if (ControlCenter._sbTimeout) { clearTimeout(ControlCenter._sbTimeout); ControlCenter._sbTimeout = null; }
+                    if (ControlCenter._ccOpenTimer) { clearTimeout(ControlCenter._ccOpenTimer); ControlCenter._ccOpenTimer = null; }
+                    if (ControlCenter._closeTimer) { clearTimeout(ControlCenter._closeTimer); ControlCenter._closeTimer = null; }
+                    const dragCloseVer = (ControlCenter._animVersion || 0) + 1;
+                    ControlCenter._animVersion = dragCloseVer;
                     overlay.style.transition = 'backdrop-filter 0.35s ease, background-color 0.35s ease, -webkit-backdrop-filter 0.35s ease';
                     void overlay.offsetHeight;
                     overlay.style.backdropFilter = '';
                     overlay.style.webkitBackdropFilter = '';
                     overlay.style.backgroundColor = '';
-                    if (globalClock) globalClock.style.opacity = '';
-                    if (statusBar) {
-                        statusBar.style.transform = '';
-                        statusBar.style.pointerEvents = '';
-                        const ver = ControlCenter._animVersion;
-                        const onDone = (e) => {
-                            if (e.propertyName !== 'transform') return;
-                            statusBar.removeEventListener('transitionend', onDone);
-                            if (ver !== ControlCenter._animVersion) return;
-                            if (clock) { clock.style.transition = 'none'; clock.style.opacity = ''; }
-                            if (globalClock) { globalClock.style.transition = 'none'; globalClock.style.opacity = ''; }
-                            statusBar.style.transition = '';
-                            statusBar.style.zIndex = '';
-                            requestAnimationFrame(() => {
-                                requestAnimationFrame(() => {
-                                    if (ver !== ControlCenter._animVersion) return;
-                                    if (clock) clock.style.transition = '';
-                                    if (globalClock) globalClock.style.transition = '';
-                                });
-                            });
-                        };
-                        statusBar.addEventListener('transitionend', onDone);
-                    }
-                    if (clock) clock.style.opacity = '';
-                    document.body.classList.remove('cc-open');
+                    ControlCenter._ccOpenTimer = setTimeout(() => {
+                        if (dragCloseVer !== ControlCenter._animVersion) return;
+                        document.body.classList.remove('cc-open');
+                        ControlCenter._ccOpenTimer = null;
+                    }, 400);
                     ControlCenter._closeTimer = setTimeout(() => {
+                        if (dragCloseVer !== ControlCenter._animVersion) return;
                         if (panel) { panel.classList.remove('cc-visible', 'cc-closing'); }
                         overlay.style.backdropFilter = '';
                         overlay.style.webkitBackdropFilter = '';
@@ -134,6 +110,17 @@ const ControlCenter = {
                         overlay.style.transition = '';
                         ControlCenter._closeTimer = null;
                     }, 550);
+                    const sbRight = document.getElementById('sb-right');
+                    const ccDate = document.getElementById('cc-date');
+                    if (sbRight) {
+                        sbRight.style.transition = 'transform 0.2s ease';
+                        sbRight.style.transform = `translateY(0px)`;
+                        ControlCenter._sbTimeout = setTimeout(() => { if (sbRight) sbRight.style.transition = ''; ControlCenter._sbTimeout = null; }, 200);
+                    }
+                    if (ccDate) {
+                        ccDate.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
+                        ccDate.style.transform = `translateY(0px)`;
+                    }
                 }
             }
         };
@@ -144,8 +131,8 @@ const ControlCenter = {
             const scaleFactor = document.fullscreenElement ? 1 : rect.width / (State.devWidth || 400);
             const localX = (touch.clientX - rect.left) / scaleFactor;
             const localY = (touch.clientY - rect.top) / scaleFactor;
-            
-            if (!State.locked && State.poweredOn) {
+
+                        if (!State.locked && State.poweredOn) {
                 if (!ControlCenter.isOpen && localX > 200 && localY < 50) {
                     ccStartY = touch.clientY;
                     ccTracking = true;
@@ -191,8 +178,8 @@ const ControlCenter = {
             let panelDragStartY = 0;
             let panelDragging = false;
             let panelHasMoved = false;
-            
-            ccPanel.addEventListener('mousedown', (e) => {
+
+                        ccPanel.addEventListener('mousedown', (e) => {
                 if (!State.locked && State.poweredOn && ControlCenter.isOpen) {
                     if (e.target.closest('.cc-slider-tile')) return;
                     panelDragStartY = e.clientY;
@@ -201,8 +188,8 @@ const ControlCenter = {
                     ccStartIsOpen = true;
                 }
             });
-            
-            document.addEventListener('mousemove', (e) => {
+
+                        document.addEventListener('mousemove', (e) => {
                 if (!panelDragging) return;
                 let diff = e.clientY - panelDragStartY;
                 if (!panelHasMoved && Math.abs(diff) < 10) return;
@@ -214,8 +201,8 @@ const ControlCenter = {
                 }
                 updateCCProgress(diff);
             });
-            
-            document.addEventListener('mouseup', (e) => {
+
+                        document.addEventListener('mouseup', (e) => {
                 if (panelDragging) {
                     panelDragging = false;
                     if (!panelHasMoved) return;
@@ -227,7 +214,7 @@ const ControlCenter = {
 
         const statusBar = document.querySelector('.status-bar');
         if (statusBar) {
-            const rightArea = statusBar.querySelector('div');
+            const rightArea = statusBar.querySelector('#sb-right');
             if (rightArea) {
                 rightArea.style.pointerEvents = 'auto';
                 rightArea.style.cursor = 'grab';
@@ -301,6 +288,9 @@ const ControlCenter = {
                 tile.classList.add('cc-slider-dragging');
                 const panel = document.getElementById('cc-panel');
                 if (panel) panel.style.overflowY = 'hidden';
+                if (input.id === 'cc-brightness') {
+                    document.body.classList.add('cc-brightness-preview');
+                }
                 syncFromY(e.clientY);
             });
             tile.addEventListener('pointermove', (e) => {
@@ -314,6 +304,9 @@ const ControlCenter = {
                 tile.classList.remove('cc-slider-dragging');
                 const panel = document.getElementById('cc-panel');
                 if (panel) panel.style.overflowY = '';
+                if (input.id === 'cc-brightness') {
+                    document.body.classList.remove('cc-brightness-preview');
+                }
             };
             tile.addEventListener('pointerup', endDrag);
             tile.addEventListener('pointercancel', endDrag);
@@ -323,36 +316,39 @@ const ControlCenter = {
         if (ControlCenter.isOpen) ControlCenter.close();
         else ControlCenter.open();
     },
+    _updateCCDate: () => {
+        const dateEl = document.getElementById('cc-date');
+        if (!dateEl) return;
+        const now = new Date();
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        dateEl.textContent = `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}`;
+    },
     open: (fromDrag = false) => {
         if (!State.poweredOn || State.locked) return;
         if (ControlCenter._closeTimer) { clearTimeout(ControlCenter._closeTimer); ControlCenter._closeTimer = null; }
+        if (ControlCenter._sbTimeout) { clearTimeout(ControlCenter._sbTimeout); ControlCenter._sbTimeout = null; }
+        if (ControlCenter._ccOpenTimer) { clearTimeout(ControlCenter._ccOpenTimer); ControlCenter._ccOpenTimer = null; }
         ControlCenter._animVersion = (ControlCenter._animVersion || 0) + 1;
         ControlCenter.isOpen = true;
         ControlCenter.syncState();
         const overlay = document.getElementById('cc-overlay');
         const panel = document.getElementById('cc-panel');
-        const statusBar = document.querySelector('.status-bar');
-        const clock = statusBar ? statusBar.querySelector('#clock') : null;
-        const globalClock = document.getElementById('global-clock');
         document.body.classList.add('cc-open');
         panel.classList.remove('cc-closing');
         overlay.classList.add('cc-visible');
         panel.classList.add('cc-visible');
-        if (!fromDrag) {
-            if (globalClock) { globalClock.style.transition = 'none'; globalClock.style.opacity = '0'; }
-            if (statusBar) {
-                statusBar.style.transition = 'transform 0.45s cubic-bezier(0.2, 0.85, 0.1, 1)';
-                void statusBar.offsetHeight;
-                statusBar.style.transform = 'translateY(40px)';
-                statusBar.style.zIndex = '2500';
-                statusBar.style.pointerEvents = 'none';
-            }
-            if (clock) { clock.style.transition = 'none'; clock.style.opacity = '1'; }
-        } else {
-            if (statusBar) {
-                statusBar.style.zIndex = '2500';
-                statusBar.style.pointerEvents = 'none';
-            }
+        ControlCenter._updateCCDate();
+        const sbRight = document.getElementById('sb-right');
+        const ccDate = document.getElementById('cc-date');
+        if (sbRight) {
+            sbRight.style.transition = 'transform 0.2s ease';
+            sbRight.style.transform = 'translateY(40px)';
+            ControlCenter._sbTimeout = setTimeout(() => { if (sbRight) sbRight.style.transition = ''; ControlCenter._sbTimeout = null; }, 200);
+        }
+        if (ccDate) {
+            ccDate.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
+            ccDate.style.transform = 'translateY(40px)';
         }
     },
     close: (fromDrag = false) => {
@@ -360,32 +356,27 @@ const ControlCenter = {
         ControlCenter.isOpen = false;
         ControlCenter._animVersion = (ControlCenter._animVersion || 0) + 1;
         const ver = ControlCenter._animVersion;
+        if (ControlCenter._sbTimeout) { clearTimeout(ControlCenter._sbTimeout); ControlCenter._sbTimeout = null; }
+        if (ControlCenter._ccOpenTimer) { clearTimeout(ControlCenter._ccOpenTimer); ControlCenter._ccOpenTimer = null; }
         const overlay = document.getElementById('cc-overlay');
         const panel = document.getElementById('cc-panel');
-        const statusBar = document.querySelector('.status-bar');
-        const clock = statusBar ? statusBar.querySelector('#clock') : null;
-        const globalClock = document.getElementById('global-clock');
         panel.classList.add('cc-closing');
         overlay.classList.remove('cc-visible');
-        document.body.classList.remove('cc-open');
-        if (statusBar) {
-            if (!fromDrag) {
-                statusBar.style.transition = 'transform 0.45s cubic-bezier(0.2, 0.85, 0.1, 1)';
-                void statusBar.offsetHeight;
-                statusBar.style.transform = '';
-            }
-            statusBar.style.pointerEvents = '';
-            const onDone = (e) => {
-                if (e.propertyName !== 'transform') return;
-                statusBar.removeEventListener('transitionend', onDone);
-                if (ver !== ControlCenter._animVersion) return;
-                statusBar.style.transition = '';
-                statusBar.style.zIndex = '';
-                if (clock) { clock.style.transition = ''; clock.style.opacity = ''; }
-                if (globalClock) { globalClock.style.transition = ''; globalClock.style.opacity = ''; }
-            };
-            statusBar.addEventListener('transitionend', onDone);
+        const sbRight = document.getElementById('sb-right');
+        const ccDate = document.getElementById('cc-date');
+        if (sbRight) {
+            sbRight.style.transition = 'transform 0.2s ease';
+            sbRight.style.transform = 'translateY(0px)';
+            ControlCenter._sbTimeout = setTimeout(() => { if (sbRight) sbRight.style.transition = ''; ControlCenter._sbTimeout = null; }, 200);
         }
+        if (ccDate) {
+            ccDate.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
+            ccDate.style.transform = 'translateY(0px)';
+        }
+        ControlCenter._ccOpenTimer = setTimeout(() => {
+            if (ver !== ControlCenter._animVersion) return;
+            document.body.classList.remove('cc-open');
+        }, 400);
         ControlCenter._closeTimer = setTimeout(() => {
             if (ver !== ControlCenter._animVersion) return;
             panel.classList.remove('cc-visible');
@@ -397,18 +388,24 @@ const ControlCenter = {
         ControlCenter.isOpen = false;
         ControlCenter._animVersion = (ControlCenter._animVersion || 0) + 1;
         if (ControlCenter._closeTimer) { clearTimeout(ControlCenter._closeTimer); ControlCenter._closeTimer = null; }
+        if (ControlCenter._sbTimeout) { clearTimeout(ControlCenter._sbTimeout); ControlCenter._sbTimeout = null; }
+        if (ControlCenter._ccOpenTimer) { clearTimeout(ControlCenter._ccOpenTimer); ControlCenter._ccOpenTimer = null; }
         const overlay = document.getElementById('cc-overlay');
         const panel = document.getElementById('cc-panel');
-        const statusBar = document.querySelector('.status-bar');
-        const clock = statusBar ? statusBar.querySelector('#clock') : null;
-        const globalClock = document.getElementById('global-clock');
         document.body.classList.remove('cc-open');
         overlay.classList.remove('cc-visible');
         panel.classList.remove('cc-visible');
         panel.classList.remove('cc-closing');
-        if (statusBar) { statusBar.style.transition = ''; statusBar.style.transform = ''; statusBar.style.zIndex = ''; statusBar.style.pointerEvents = ''; }
-        if (clock) { clock.style.transition = ''; clock.style.opacity = ''; }
-        if (globalClock) { globalClock.style.transition = ''; globalClock.style.opacity = ''; }
+        const sbRight = document.getElementById('sb-right');
+        const ccDate = document.getElementById('cc-date');
+        if (sbRight) {
+            sbRight.style.transition = '';
+            sbRight.style.transform = 'translateY(0px)';
+        }
+        if (ccDate) {
+            ccDate.style.transition = 'opacity 0.35s ease';
+            ccDate.style.transform = 'translateY(0px)';
+        }
     },
     syncState: () => {
         const ccBright = document.getElementById('cc-brightness');

@@ -351,8 +351,8 @@ const LockScreen = {
     unlock: () => {
         const flashlight = document.getElementById('ls-flashlight');
         const camera = document.getElementById('ls-camera');
-        
-        if (!State.poweredOn && State.aod.enabled) {
+
+                if (!State.poweredOn && State.aod.enabled) {
             if (flashlight) { flashlight.style.transition = 'none'; flashlight.style.opacity = '0'; }
             if (camera) { camera.style.transition = 'none'; camera.style.opacity = '0'; }
         }
@@ -371,14 +371,14 @@ const LockScreen = {
         if (gClockUnlock) { gClockUnlock.style.transition = ''; gClockUnlock.style.opacity = ''; gClockUnlock.style.transform = ''; }
         document.getElementById('lock-screen').classList.add('hidden');
         document.getElementById('home-screen').classList.remove('hidden-locked');
-        
-        const homeContents = document.getElementById('home-contents');
+
+                const homeContents = document.getElementById('home-contents');
         if (homeContents) {
             homeContents.style.transition = '';
             homeContents.style.opacity = '';
         }
-        
-        if (gClockUnlock) {
+
+                if (gClockUnlock) {
             gClockUnlock.classList.add('hidden');
             gClockUnlock.classList.remove('ls-clock-box');
             if (LockScreen._clockBoxHandler) {
