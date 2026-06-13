@@ -1,4 +1,4 @@
-# **RealOS 3.0.5.0**
+# **RealOS 3.0.307.0**
 
 an operating system simulator heavily inspired by @sungsamtech's OriginWEB (https://quandz24-ui.github.io/OriginWEB)
 
